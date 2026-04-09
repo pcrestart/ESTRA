@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etiqueta – </title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:    #C8102E;
+    --navy:   #002147;
+    --steel:  #3A4A5C;
+    --light:  #F4F6F9;
+    --border: #B0BACA;
+    --accept: #1A7A3A;
+    --reject: #C8102E;
+    --warn:   #D97706;
+  }
+
+  body {
+    background: #D8DEE8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    font-family: 'Barlow', sans-serif;
+  }
+
+  /* ── CONTROLS ─────────────────────────────────────────────── */
+  .controls {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    margin-bottom: 24px;
+  }
+  .controls h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 14px;
+  }
+  .field-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .field-row label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--steel);
+  }
+  .field-row input, .field-row select {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--navy);
+    background: var(--light);
+    transition: border-color .2s;
+    outline: none;
+  }
+  .field-row input:focus, .field-row select:focus { border-color: var(--red); }
+
+  /* Radio toggle */
+  .radio-toggle { display: flex; border-radius: 8px; overflow: hidden; border: 2px solid var(--border); }
+  .radio-toggle input[type="radio"] { display: none; }
+  .radio-toggle label {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: #fff;
+    color: var(--steel);
+    transition: all .2s;
+    user-select: none;
+  }
+  .radio-toggle label:first-of-type { border-right: 1px solid var(--border); }
+  #r-accept:checked ~ label[for="r-accept"],
+  .radio-toggle input#r-accept:checked + label { background: var(--accept); color: #fff; border-color: var(--accept); }
+  #r-reject:checked ~ label[for="r-reject"],
+  .radio-toggle input#r-reject:checked + label { background: var(--reject); color: #fff; border-color: var(--reject); }
+  /* simpler targeting */
+  .toggle-accept.chosen { background: var(--accept) !important; color: #fff !important; }
+  .toggle-reject.chosen { background: var(--reject) !important; color: #fff !important; }
+
+  .btn-print {
+    width: 100%;
+    margin-top: 16px;
+    padding: 11px 0;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-print:hover { background: var(--red); }
+
+  /* ── LABEL CARD ───────────────────────────────────────────── */
+  .label-wrap {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .label {
+    background: #fff;
+    border: 3px solid var(--navy);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: 'Barlow Condensed', sans-serif;
+    box-shadow: 0 6px 28px rgba(0,21,67,.22);
+  }
+
+  /* Header */
+  .lbl-header {
+    display: flex;
+    align-items: stretch;
+    background: var(--navy);
+    border-bottom: 3px solid var(--red);
+    min-height: 72px;
+  }
+  .lbl-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-right: 2px solid rgba(255,255,255,.15);
+    flex-shrink: 0;
+  }
+  /* SVG recreation of ES Automotive logo mark */
+  .logo-svg { width: 56px; height: 42px; }
+
+  .lbl-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 16px;
+  }
+  .lbl-company {
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: rgba(255,255,255,.55);
+    text-transform: uppercase;
+  }
+  .lbl-doc-title {
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: .04em;
+    color: #fff;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .lbl-doc-title span { color: var(--red); margin-right: 4px; }
+
+  .lbl-project-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    flex-shrink: 0;
+  }
+  .project-pill {
+    background: var(--red);
+    color: #fff;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: .1em;
+    padding: 6px 14px;
+    border-radius: 4px;
+  }
+
+  /* Part info row */
+  .lbl-part-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid var(--navy);
+  }
+  .lbl-part-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    border-right: 2px solid var(--navy);
+  }
+  .pi-cell {
+    padding: 8px 12px;
+    border-bottom: 1.5px solid #D8DEE8;
+  }
+  .pi-cell:last-child, .pi-cell:nth-last-child(2) { border-bottom: none; }
+  .pi-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 2px;
+  }
+  .pi-value {
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--navy);
+    letter-spacing: .02em;
+    line-height: 1.1;
+  }
+  .pi-value.large { font-size: 20px; }
+
+  .lbl-part-image {
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--light);
+    padding: 8px;
+  }
+  /* Stylized part silhouette */
+  .part-svg { width: 68px; height: 68px; }
+
+  /* Data fields (quantity, process) */
+  .lbl-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid var(--navy);
+  }
+  .lbl-field {
+    padding: 10px 12px;
+    border-right: 1.5px solid #D8DEE8;
+  }
+  .lbl-field:last-child { border-right: none; }
+  .f-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 4px;
+  }
+  .f-value {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    min-height: 28px;
+  }
+  .f-value.process-text { font-size: 15px; font-weight: 700; }
+  .f-value.empty { color: #C0C8D4; font-weight: 400; font-size: 13px; }
+
+  /* Condition bar – single result */
+  .lbl-condition {
+    border-bottom: 2px solid var(--navy);
+    transition: background .25s;
+  }
+  .cond-result {
+    display: none;
+    width: 100%;
+    text-align: center;
+    padding: 14px 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .cond-result.show { display: block; }
+  .cond-result.accept-result { background: var(--accept); }
+  .cond-result.reject-result { background: var(--reject); }
+  .cond-none {
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--border);
+    text-align: center;
+  }
+
+  /* Footer */
+  .lbl-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    background: var(--light);
+  }
+  .footer-txt {
+    font-size: 9px;
+    color: var(--border);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .defect-codes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .dc {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--steel);
+    background: #E4E8EF;
+    border-radius: 2px;
+    padding: 2px 4px;
+    letter-spacing: .04em;
+  }
+
+  /* ── DEFECT CHIPS (controls) ── */
+  .defect-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-top: 4px;
+  }
+  .defect-chip {
+    padding: 9px 6px;
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    color: var(--steel);
+    transition: all .18s;
+    user-select: none;
+  }
+  .defect-chip:hover { border-color: var(--red); color: var(--red); }
+  .defect-chip.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .defect-chip.otros-chip { grid-column: 1 / -1; }
+  .otros-input { display: none; margin-top: 7px; }
+  .otros-input textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    background: var(--light);
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .otros-input textarea:focus { border-color: var(--red); }
+
+  /* ── DEFECT result in label ── */
+  .lbl-defect-result {
+    border-bottom: 2px solid var(--navy);
+    background: var(--light);
+  }
+  .defect-result-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 14px;
+    min-height: 38px;
+  }
+  .defect-result-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--steel);
+    flex-shrink: 0;
+  }
+  .defect-badge {
+    display: none;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 11px;
+    border-radius: 4px;
+  }
+  .defect-badge.show { display: inline-block; }
+  .defect-comment { display:none; font-family:'Barlow',sans-serif; font-size:11px; color:var(--steel); font-style:italic; width:100%; }
+  .defect-comment.show { display: block; }
+  .defect-none-txt { font-size:10px; color:var(--border); font-family:'Barlow Condensed',sans-serif; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+
+  /* ── PRINT ──────────────────────────────────────────────────── */
+  .print-container { display: none; }
+
+  @media print {
+    body { background: none; padding: 0; margin: 0; }
+    .controls, .label-wrap { display: none !important; }
+    .print-container {
+      display: grid !important;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0;
+      padding: 6mm;
+      box-sizing: border-box;
+      gap: 4mm;
+    }
+    .print-container.copies-1 { grid-template-columns: 1fr; }
+    .print-container.copies-2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .print-container.copies-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .print-container.copies-6 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+    .print-container.copies-8 { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4,1fr); }
+    .print-copy {
+      border: 1.5px solid #002147;
+      border-radius: 3px;
+      overflow: hidden;
+      font-family: 'Barlow Condensed', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    .print-copy * { box-sizing: border-box; }
+    /* scale images inside copies */
+    .print-copy img { max-width: 100%; height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONTROLS PANEL -->
+<div class="controls">
+  <h3>⚙ Completar Etiqueta</h3>
+
+  <div class="field-row">
+    <label>Cantidad (pzas)</label>
+    <input type="number" id="inp-qty" placeholder="Ej. 250" min="0" oninput="update()">
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div class="field-row" style="margin-bottom:0">
+      <label>Fecha</label>
+      <input type="date" id="inp-fecha" onchange="update()">
+    </div>
+    <div class="field-row" style="margin-bottom:0">
+      <label>Turno</label>
+      <select id="inp-turno" onchange="update()">
+        <option value="">— Turno —</option>
+        <option value="T1">T1 · Matutino</option>
+        <option value="T2">T2 · Vespertino</option>
+        <option value="T3">T3 · Nocturno</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-bottom:12px"></div>
+  <div class="field-row">
+    <label>Proceso</label>
+    <select id="inp-process" onchange="update()">
+      <option value="">— Seleccionar proceso —</option>
+      <option>Inyección</option>
+      <option>Ensamble</option>
+      <option>Inspección Visual</option>
+      <option>Código QR Manual</option>
+      <option>Inspección Incoming</option>
+      <option>Dimensional CMM</option>
+      <option>Empaque</option>
+      <option>Cuarentena</option>
+      <option>Rework</option>
+      <option>Almacén PT</option>
+      <option>Embarque</option>
+      <option value="__otros__">Otros…</option>
+    </select>
+    <div class="otros-input" id="proceso-otros-input">
+      <input type="text" id="proceso-otros-text" placeholder="Describe el proceso…" oninput="update()">
+    </div>
+  </div>
+
+  <div class="field-row">
+    <label>Condición</label>
+    <div class="radio-toggle">
+      <label class="toggle-accept" id="btn-accept" onclick="setCondition('ACEPTADO')">✔ Aceptado</label>
+      <label class="toggle-reject" id="btn-reject" onclick="setCondition('RECHAZADO')">✘ Rechazado</label>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <label>⚠ Código de Defecto</label>
+    <div class="defect-grid">
+      <div class="defect-chip" onclick="setDefect('TIRO CORTO')">Tiro Corto</div>
+      <div class="defect-chip" onclick="setDefect('GOLPE')">Golpe</div>
+      <div class="defect-chip" onclick="setDefect('DESPRENDIMIENTO')">Desprendimiento</div>
+      <div class="defect-chip" onclick="setDefect('REBABA')">Rebaba</div>
+      <div class="defect-chip" onclick="setDefect('MANCHAS')">Manchas</div>
+      <div class="defect-chip" onclick="setDefect('ÓXIDOS')">Óxidos</div>
+      <div class="defect-chip otros-chip" id="chip-otros" onclick="setDefect('OTROS')">Otros…</div>
+    </div>
+    <div class="otros-input" id="otros-input">
+      <textarea id="otros-text" placeholder="Describe el defecto…" oninput="updateOtros()"></textarea>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+    <div class="field-row" style="margin-bottom:0">
+      <label>Tamaño</label>
+      <select id="inp-size" onchange="updatePrint()">
+        <option value="1">Grande (1 por hoja)</option>
+        <option value="2">Mediano (2 por hoja)</option>
+        <option value="4" selected>Normal (4 por hoja)</option>
+        <option value="6">Pequeño (6 por hoja)</option>
+        <option value="8">Mini (8 por hoja)</option>
+      </select>
+    </div>
+    <div class="field-row" style="margin-bottom:0">
+      <label>Copias</label>
+      <input type="number" id="inp-copies" value="4" min="1" max="50"
+             style="font-weight:700;" oninput="updatePrint()">
+    </div>
+  </div>
+  <div id="print-summary" style="font-size:11px;color:#3A4A5C;text-align:center;
+       margin-bottom:10px;font-weight:600;letter-spacing:.04em;">
+    4 etiquetas · 1 hoja A4
+  </div>
+
+  <button class="btn-print" onclick="doPrint()">🖨 Imprimir Etiqueta</button>
+</div>
+
+<!-- LABEL -->
+<div class="label-wrap">
+<div class="label" id="label-card">
+
+  <!-- HEADER -->
+  <div class="lbl-header">
+    <div class="lbl-logo">
+      <img src="https://www.estra-automotive.com/wp-content/themes/estra/img/logo_estra_white.svg" style="width:62px;height:62px;object-fit:contain;display:block;" alt="ES Automotive">
+    </div>
+    <div class="lbl-title">
+      <div class="lbl-company">ESTRA Automotive Systems</div>
+      <div class="lbl-doc-title"><span>■</span>ETIQUETA DE IDENTIFICACIÓN</div>
+    </div>
+    <div class="lbl-project-badge">
+      <div class="project-pill">QA</div>
+    </div>
+  </div>
+
+  <!-- PART INFORMATION -->
+  <div class="lbl-part-row">
+    <div class="lbl-part-main">
+      <div class="pi-cell" style="grid-column:1; border-right:1.5px solid #D8DEE8;">
+        <div class="pi-label">No. Parte</div>
+      </div>
+      <div class="pi-cell" style="grid-column:2; display:flex; gap:14px; align-items:center;">
+        <div>
+          <div class="pi-label">Fecha</div>
+          <div style="font-weight:700;font-size:12px;color:#002147;" id="disp-fecha">—</div>
+        </div>
+        <div>
+          <div class="pi-label">Turno</div>
+          <div style="font-weight:800;font-size:13px;color:#C8102E;" id="disp-turno">—</div>
+        </div>
+      </div>
+      <div class="pi-cell" style="grid-column:1; border-right:1.5px solid #D8DEE8; border-bottom:none;">
+        <div class="pi-value" style="font-size:11px; color:var(--steel);"></div>
+		<!-- habia texto		  -->
+      </div>
+      <div class="pi-cell" style="grid-column:2; border-bottom:none;">
+        <div class="pi-label">Nombre de Pieza</div>
+        <div class="pi-value large"></div>
+		  <!-- habia texto		  -->
+      </div>
+    </div>
+    <!-- Part image - real photo processed -->
+    <div class="lbl-part-image">
+      <img src="https://www.estra-automotive.com/wp-content/themes/estra/img/logo_estra_2019.svg" style="width:88px;height:88px;object-fit:contain;display:block;margin:auto;" alt="CORE BOBBIN ASSY">
+    </div>
+  </div>
+
+  <!-- QUANTITY & PROCESS -->
+  <div class="lbl-fields">
+    <div class="lbl-field">
+      <div class="f-label">Cantidad</div>
+      <div class="f-value" id="disp-qty"><span class="empty">— pzas</span></div>
+    </div>
+    <div class="lbl-field">
+      <div class="f-label">Proceso</div>
+      <div class="f-value process-text" id="disp-process"><span class="empty">—</span></div>
+    </div>
+  </div>
+
+  <!-- CONDITION BAR -->
+  <div class="lbl-condition">
+    <div class="cond-none" id="cond-none">CONDICIÓN — Sin seleccionar</div>
+    <div class="cond-result accept-result" id="disp-accept">✔ ACEPTADO</div>
+    <div class="cond-result reject-result" id="disp-reject">✘ RECHAZADO</div>
+  </div>
+
+  <!-- DEFECT RESULT -->
+  <div class="lbl-defect-result">
+    <div class="defect-result-inner">
+      <span class="defect-result-lbl">⚠ Defecto:</span>
+      <span class="defect-none-txt" id="defect-none">Sin seleccionar</span>
+      <span class="defect-badge" id="defect-badge"></span>
+      <span class="defect-comment" id="defect-comment"></span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="lbl-footer">
+    <span class="footer-txt">ESTRA Automotive Systems</span>
+  </div>
+
+</div><!-- /label -->
+</div><!-- /label-wrap -->
+
+<!-- PRINT MOSAIC CONTAINER -->
+<div class="print-container" id="print-container"></div>
+
+<script>
+  let currentCondition = null;
+  window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('inp-fecha').value = today;
+    update();
+  });
+  let currentDefect = null;
+
+  function update() {
+    const qty = document.getElementById('inp-qty').value;
+    const proc = document.getElementById('inp-process').value;
+
+    const dispQty = document.getElementById('disp-qty');
+    dispQty.innerHTML = (qty && qty > 0)
+      ? `<span style="color:var(--navy)">${parseInt(qty).toLocaleString('es-MX')} pzas</span>`
+      : `<span class="empty">— pzas</span>`;
+
+    // Show/hide proceso otros input
+    const procOtrosInput = document.getElementById('proceso-otros-input');
+    if (proc === '__otros__') {
+      procOtrosInput.style.display = 'block';
+    } else {
+      procOtrosInput.style.display = 'none';
+    }
+
+    // Fecha
+    const fecha = document.getElementById('inp-fecha').value;
+    const dispFecha = document.getElementById('disp-fecha');
+    if (fecha) {
+      const [y,m,d] = fecha.split('-');
+      dispFecha.textContent = `${d}/${m}/${y}`;
+    } else {
+      dispFecha.textContent = '—';
+    }
+
+    // Turno
+    const turno = document.getElementById('inp-turno').value;
+    const dispTurno = document.getElementById('disp-turno');
+    dispTurno.textContent = turno || '—';
+
+    const dispProc = document.getElementById('disp-process');
+    let procLabel = proc;
+    if (proc === '__otros__') {
+      const txt = document.getElementById('proceso-otros-text').value.trim();
+      procLabel = txt || '';
+    }
+    dispProc.innerHTML = procLabel
+      ? `<span style="color:var(--navy)">${procLabel}</span>`
+      : `<span class="empty">—</span>`;
+  }
+
+  function setCondition(val) {
+    currentCondition = val;
+    document.getElementById('btn-accept').classList.toggle('chosen', val === 'ACEPTADO');
+    document.getElementById('btn-reject').classList.toggle('chosen', val === 'RECHAZADO');
+    document.getElementById('cond-none').style.display = 'none';
+    document.getElementById('disp-accept').classList.toggle('show', val === 'ACEPTADO');
+    document.getElementById('disp-reject').classList.toggle('show', val === 'RECHAZADO');
+  }
+
+  function setDefect(val) {
+    // Toggle: click same again to deselect
+    if (currentDefect === val) {
+      currentDefect = null;
+      document.querySelectorAll('.defect-chip').forEach(c => c.classList.remove('active'));
+      document.getElementById('otros-input').style.display = 'none';
+      showDefectInLabel(null, '');
+      return;
+    }
+    currentDefect = val;
+    // Update chips
+    document.querySelectorAll('.defect-chip').forEach(c => {
+      const matches = c.textContent.trim().toUpperCase() === val ||
+                      (val === 'OTROS' && c.id === 'chip-otros');
+      c.classList.toggle('active', matches ||
+        c.onclick && c.getAttribute('onclick') === `setDefect('${val}')`);
+    });
+    // Re-do cleanly
+    document.querySelectorAll('.defect-chip').forEach(c => c.classList.remove('active'));
+    const chips = document.querySelectorAll('.defect-chip');
+    chips.forEach(c => {
+      if (c.getAttribute('onclick') === `setDefect('${val}')`) c.classList.add('active');
+    });
+    // Show/hide otros textarea
+    const otrosInput = document.getElementById('otros-input');
+    otrosInput.style.display = (val === 'OTROS') ? 'block' : 'none';
+
+    const comment = (val === 'OTROS') ? document.getElementById('otros-text').value : '';
+    showDefectInLabel(val, comment);
+  }
+
+  function updateOtros() {
+    const txt = document.getElementById('otros-text').value;
+    showDefectInLabel('OTROS', txt);
+  }
+
+  function showDefectInLabel(defect, comment) {
+    const none  = document.getElementById('defect-none');
+    const badge = document.getElementById('defect-badge');
+    const comm  = document.getElementById('defect-comment');
+    if (!defect) {
+      none.style.display = '';
+      badge.className = 'defect-badge';
+      comm.className  = 'defect-comment';
+      return;
+    }
+    none.style.display = 'none';
+    badge.textContent = defect;
+    badge.className = 'defect-badge show';
+    if (comment && comment.trim()) {
+      comm.textContent = comment;
+      comm.className = 'defect-comment show';
+    } else {
+      comm.className = 'defect-comment';
+    }
+  }
+
+  /* ── PRINT MOSAIC ── */
+  function updatePrint() {
+    const size   = parseInt(document.getElementById('inp-size').value);
+    const copies = parseInt(document.getElementById('inp-copies').value) || 1;
+    const sheets = Math.ceil(copies / size);
+    document.getElementById('print-summary').textContent =
+      copies + ' etiqueta' + (copies > 1 ? 's' : '') + ' · ' +
+      sheets + ' hoja' + (sheets > 1 ? 's' : '') + ' Carta';
+  }
+
+  function doPrint() {
+    const size   = parseInt(document.getElementById('inp-size').value);
+    const copies = parseInt(document.getElementById('inp-copies').value) || 1;
+
+    // Snapshot label HTML (live state)
+    const labelHTML = document.getElementById('label-card').innerHTML;
+
+    // Build/replace the hidden print container
+    let container = document.getElementById('print-container');
+    container.innerHTML = '';
+    container.className = 'print-container copies-' + size;
+
+    for (let i = 0; i < copies; i++) {
+      // Page break every 'size' items (except first)
+      if (i > 0 && i % size === 0) {
+        const pb = document.createElement('div');
+        pb.style.cssText = 'page-break-before:always; grid-column:1/-1;';
+        container.appendChild(pb);
+      }
+      const copy = document.createElement('div');
+      copy.className = 'print-copy';
+      copy.innerHTML = labelHTML;
+      container.appendChild(copy);
+    }
+
+    window.print();
+  }
+
+  /* Auto-init */
+  window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('inp-fecha').value = today;
+    update();
+    updatePrint();
+  });
+</script>
+
+</body>
+</html>
